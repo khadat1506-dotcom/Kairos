@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inconsolata:wght@300;400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════
    KAIROS — Design System
@@ -1638,7 +1639,109 @@ function loadState(){
     saveState();
   }
 }
-function saveState(){localStorage.setItem('kairos_whq_v8',JSON.stringify(S));}
+function saveState(){
+  try{localStorage.setItem('kairos_whq_v8',JSON.stringify(S));}catch(e){}
+  schedulePush();
+}
+
+// ═══════════════════════════════════════════════════
+// CLOUD SYNC  (Supabase Realtime - whole-document, last-write-wins)
+// ═══════════════════════════════════════════════════
+var SB_URL=(window.KAIROS_SUPABASE_URL||'').trim();
+var SB_KEY=(window.KAIROS_SUPABASE_KEY||'').trim();
+var CLOUD=!!(SB_URL&&SB_KEY);
+var DOC_ID='main';
+var CLIENT_ID=Math.random().toString(36).slice(2)+Date.now().toString(36);
+var supa=null, cloudReady=false, applyingRemote=false, pushTimer=null;
+
+function setSync(s){
+  var el=document.getElementById('kairosSync');
+  if(!el)return;
+  el.className='kairos-sync '+s;
+  var lbl=el.querySelector('.ks-label');
+  if(lbl)lbl.textContent=({live:'Synced',saving:'Saving…',offline:'Offline',local:'Local only'})[s]||s;
+}
+
+// Re-run the exact boot render sequence so the UI reflects current S
+function renderAll(){
+  renderPlan();renderBudget();renderDeals();renderRemindersEdit();loadPipe();updateAll();
+}
+
+function schedulePush(){
+  if(!cloudReady||applyingRemote)return;
+  setSync('saving');
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(pushToCloud,400);
+}
+
+async function pushToCloud(){
+  if(!cloudReady||applyingRemote)return;
+  try{
+    var res=await supa.from('kairos_state').upsert({
+      id:DOC_ID, data:S, client_id:CLIENT_ID, updated_at:new Date().toISOString()
+    });
+    if(res.error)throw res.error;
+    setSync('live');
+  }catch(e){console.error('Kairos cloud push failed',e);setSync('offline');}
+}
+
+async function pullFromCloud(){
+  var res=await supa.from('kairos_state').select('*').eq('id',DOC_ID).maybeSingle();
+  if(res.error)throw res.error;
+  if(res.data&&res.data.data){applyRemoteState(res.data.data);return true;}
+  return false;
+}
+
+// Adopt a remote snapshot into S, persist locally, and re-render. Guards
+// against echoing the change straight back to the cloud.
+function applyRemoteState(remote){
+  if(!remote)return;
+  applyingRemote=true;
+  try{
+    if(remote.tasks!==undefined)S.tasks=remote.tasks;
+    if(remote.pipe)S.pipe=remote.pipe;
+    if(remote.deals!==undefined)S.deals=remote.deals;
+    if(remote.budget){
+      S.budget=S.budget||{};
+      if(remote.budget.june)S.budget.june=remote.budget.june;
+      if(remote.budget.july)S.budget.july=remote.budget.july;
+      if(remote.budget.aug)S.budget.aug=remote.budget.aug;
+    }
+    if(remote.reminders!==undefined)S.reminders=remote.reminders;
+    if(remote.weekTasks!==undefined)S.weekTasks=remote.weekTasks;
+    if(remote.taskDone!==undefined)S.taskDone=remote.taskDone;
+    try{localStorage.setItem('kairos_whq_v8',JSON.stringify(S));}catch(e){}
+    renderAll();
+  }finally{applyingRemote=false;}
+}
+
+function subscribeRealtime(){
+  supa.channel('kairos-state')
+    .on('postgres_changes',{event:'*',schema:'public',table:'kairos_state'},function(payload){
+      var row=payload.new;
+      if(!row||row.id!==DOC_ID)return;
+      if(row.client_id===CLIENT_ID)return; // ignore our own write echoed back
+      applyRemoteState(row.data);
+    })
+    .subscribe();
+}
+
+async function initCloud(){
+  if(!CLOUD){setSync('local');return;}
+  try{
+    var mod=await import('https://esm.sh/@supabase/supabase-js@2');
+    supa=mod.createClient(SB_URL,SB_KEY);
+    cloudReady=true;
+    var had=await pullFromCloud();        // cloud is source of truth across devices
+    if(!had)await pushToCloud();          // first run on a fresh project: seed from local
+    subscribeRealtime();
+    setSync('live');
+  }catch(e){
+    console.error('Kairos Supabase init failed',e);
+    cloudReady=false;
+    setSync('offline');
+  }
+}
 
 // ═══════════════════════════════════════════════════
 // HELPERS
@@ -2513,6 +2616,19 @@ renderRemindersEdit();
 loadPipe();
 updateAll();
 setTimeout(animateOverviewRings,120);
+initCloud();
 </script>
+<div id="kairosSync" class="kairos-sync local"><span class="ks-dot"></span><span class="ks-label">Local only</span></div>
+<style>
+  .kairos-sync{position:fixed;bottom:14px;right:14px;z-index:9000;display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(8,8,8,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:'Inconsolata',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5);pointer-events:none;opacity:.85;transition:color .3s ease,opacity .3s ease;}
+  .kairos-sync .ks-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 9px currentColor;flex:none;}
+  .kairos-sync.live{color:#7fffb0;}
+  .kairos-sync.saving{color:#ffce5c;}
+  .kairos-sync.saving .ks-dot{animation:ksPulse 1s ease-in-out infinite;}
+  .kairos-sync.offline{color:#ff7373;}
+  .kairos-sync.local{color:rgba(255,255,255,.38);}
+  @keyframes ksPulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  @media (max-width:600px){.kairos-sync{bottom:10px;right:10px;font-size:9px;padding:5px 9px;}}
+</style>
 </body>
 </html>
