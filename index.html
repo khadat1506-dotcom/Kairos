@@ -108,6 +108,12 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type=
   cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'><line x1='8' y1='3' x2='8' y2='21' stroke='%23c8ff00' stroke-width='1.5'/><line x1='5' y1='3' x2='11' y2='3' stroke='%23c8ff00' stroke-width='1.5'/><line x1='5' y1='21' x2='11' y2='21' stroke='%23c8ff00' stroke-width='1.5'/></svg>") 8 12, text !important;
 }
 
+/* Touch devices (iPhone/iPad): remove the custom DOM cursor entirely and let native touch behave normally. Desktop/PC is unaffected - this query never matches a mouse pointer. */
+@media (hover:none) and (pointer:coarse){
+  *, *::before, *::after{cursor:auto !important;}
+  .kc{display:none !important;}
+}
+
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
@@ -2475,6 +2481,7 @@ function updateAll(){
 (function(){
   var c=document.getElementById('kc');
   if(!c)return;
+  if(window.matchMedia&&window.matchMedia('(hover:none) and (pointer:coarse)').matches)return; // touch device: no fake cursor at all
   var mx=0,my=0,raf=false;
   function move(e){mx=e.clientX;my=e.clientY;if(!raf){raf=true;requestAnimationFrame(apply);}}
   function apply(){raf=false;c.style.left=mx+'px';c.style.top=my+'px';}
@@ -2509,6 +2516,35 @@ function updateAll(){
   });
 })();
 
+// Mobile only: horizontal swipe switches tabs (overview > plan > budget > revenue > reminders). Desktop is untouched - the guard below never matches a mouse.
+(function(){
+  if(!(window.matchMedia&&window.matchMedia('(hover:none) and (pointer:coarse)').matches))return;
+  var ORDER=['overview','plan','budget','revenue','reminders'];
+  var x0=null,y0=null,t0=0,block=false;
+  function activeIdx(){
+    for(var i=0;i<ORDER.length;i++){var p=document.getElementById(ORDER[i]);if(p&&p.classList.contains('active'))return i;}
+    return 0;
+  }
+  document.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1){x0=null;return;}
+    var tg=e.target;
+    // Don't hijack gestures meant for inputs, dropdowns, or the horizontally-scrolling deal table
+    block=!!(tg&&tg.closest&&tg.closest('input,textarea,select,.rtable-wrap'));
+    x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now();
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(x0===null||block){x0=null;return;}
+    var t=e.changedTouches[0];
+    var dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Date.now()-t0>700)return;             // too slow to be a flick
+    if(Math.abs(dx)<60)return;               // not far enough - probably a tap
+    if(Math.abs(dx)<Math.abs(dy)*1.5)return; // mostly vertical - it's a scroll
+    var i=activeIdx(),ni=dx<0?i+1:i-1;       // swipe left -> next tab, right -> previous
+    if(ni<0||ni>=ORDER.length)return;        // no wrap-around at the ends
+    goToPage(ORDER[ni]);
+  },{passive:true});
+})();
+
 // Halo scroll parallax
 var mascotTick=false;
 window.addEventListener('scroll',function(){
@@ -2532,6 +2568,7 @@ window.addEventListener('scroll',function(){
   var wrap=document.querySelector('.hero-mascot-wrap');
   var quotes=document.querySelectorAll('.fq');
   if(!hero||!crosshair||!clear)return;
+  if(window.matchMedia&&window.matchMedia('(hover:none) and (pointer:coarse)').matches)return; // touch device: skip the mouse-driven reveal
   var mx=0,my=0,active=false,running=false,overDef=false;
   var W=180,H=260,REPEL=180,FORCE=65;
   function loop(){
