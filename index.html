@@ -205,17 +205,19 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
   overflow-x:auto;
   box-shadow:0 10px 40px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,255,0,0.04);
 }
-.logo-wrap{display:flex;align-items:center;gap:14px;padding:4px 0;margin-right:48px;flex-shrink:0;}
-.logo-glyph{
-  width:14px;height:14px;background:var(--acid);transform:rotate(45deg);
-  box-shadow:0 0 16px var(--acid-glow);position:relative;
-  animation:pulseGlyph 3s ease-in-out infinite;border-radius:2px;
+.logo-wrap{display:flex;align-items:center;gap:12px;padding:4px 0;margin-right:48px;flex-shrink:0;}
+/* logo-mark.png / logo-word.png are transparent (black keyed out to alpha), so they sit cleanly on the nav and the glow tracks the actual letterforms. */
+.logo-mark{
+  height:38px;width:auto;display:block;
+  animation:markGlow 3s ease-in-out infinite;
 }
-@keyframes pulseGlyph{0%,100%{box-shadow:0 0 16px var(--acid-glow);}50%{box-shadow:0 0 32px var(--acid-glow);}}
-.logo{
-  font-family:var(--font-display);font-size:32px;color:var(--acid);
-  letter-spacing:0.2em;line-height:1;white-space:nowrap;
-  text-shadow:0 0 22px rgba(200,255,0,0.4);
+@keyframes markGlow{
+  0%,100%{filter:drop-shadow(0 0 10px rgba(200,255,0,0.30));}
+  50%{filter:drop-shadow(0 0 20px rgba(200,255,0,0.55));}
+}
+.logo-word{
+  height:23px;width:auto;display:block;
+  filter:drop-shadow(0 0 14px rgba(200,255,0,0.25));
 }
 .nav-tabs{display:flex;gap:10px;flex:1;justify-content:space-evenly;align-items:center;}
 .ntab{
@@ -983,7 +985,8 @@ button.tbadge:hover{filter:brightness(1.4);transform:scale(1.06);box-shadow:0 0 
 @media(max-width:720px){
   .nav{padding:10px 14px;margin:10px;}
   .ntab{padding:8px 12px;letter-spacing:0.16em;}
-  .logo{font-size:20px;}
+  .logo-mark{height:30px;}
+  .logo-word{height:18px;}
   .page{padding:18px 14px 50px;}
   .hero{padding:24px 18px;}
   .hero-mascot-wrap,.hero-crosshair,.float-quotes{display:none;}
@@ -1004,8 +1007,8 @@ button.tbadge:hover{filter:brightness(1.4);transform:scale(1.06);box-shadow:0 0 
 
 <div class="nav">
   <div class="logo-wrap">
-    <span class="logo-glyph"></span>
-    <div class="logo">KAIROS</div>
+    <img class="logo-mark" src="logo-mark.png" alt="Kairos">
+    <img class="logo-word" src="logo-word.png" alt="KAIROS">
   </div>
   <div class="nav-tabs">
     <button type="button" class="ntab active" onclick="goToPage('overview',this)">Overview</button>
