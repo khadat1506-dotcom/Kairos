@@ -208,7 +208,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
 .logo-wrap{display:flex;align-items:center;gap:12px;padding:4px 0;margin-right:48px;flex-shrink:0;}
 /* logo-mark.png / logo-word.png are transparent (black keyed out to alpha), so they sit cleanly on the nav and the glow tracks the actual letterforms. */
 .logo-mark{
-  height:38px;width:auto;display:block;
+  height:32px;width:auto;display:block;
   animation:markGlow 3s ease-in-out infinite;
 }
 @keyframes markGlow{
@@ -985,7 +985,7 @@ button.tbadge:hover{filter:brightness(1.4);transform:scale(1.06);box-shadow:0 0 
 @media(max-width:720px){
   .nav{padding:10px 14px;margin:10px;}
   .ntab{padding:8px 12px;letter-spacing:0.16em;}
-  .logo-mark{height:30px;}
+  .logo-mark{height:25px;}
   .logo-word{height:18px;}
   .page{padding:18px 14px 50px;}
   .hero{padding:24px 18px;}
@@ -1815,6 +1815,16 @@ function fmtDate(dateStr){
 // ═══════════════════════════════════════════════════
 // NAV — direct functions called from onclick
 // ═══════════════════════════════════════════════════
+// Scroll the active tab pill to the centre of the horizontally-scrolling nav (mobile). No-op when the nav already fits (desktop).
+function centerActiveTab(){
+  var nav=document.querySelector('.nav');
+  var active=document.querySelector('.ntab.active');
+  if(!nav||!active||nav.scrollWidth<=nav.clientWidth+1)return;
+  var navRect=nav.getBoundingClientRect();
+  var aRect=active.getBoundingClientRect();
+  var delta=(aRect.left+aRect.width/2)-(navRect.left+nav.clientWidth/2);
+  nav.scrollBy({left:delta,behavior:'smooth'});
+}
 function goToPage(id,btn){
   var pages=document.querySelectorAll('.page');
   for(var i=0;i<pages.length;i++)pages[i].classList.remove('active');
@@ -1831,6 +1841,7 @@ function goToPage(id,btn){
       if(oc.indexOf("'"+id+"'")>-1){tabs[k].classList.add('active');break;}
     }
   }
+  centerActiveTab();
   updateAll();
   window.scrollTo({top:0,behavior:'smooth'});
   setTimeout(function(){
