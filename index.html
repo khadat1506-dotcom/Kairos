@@ -726,19 +726,26 @@ svg.ring{transform:rotate(-90deg);width:210px;height:210px;display:block;filter:
   display:flex;flex-direction:column;gap:9px;
 }
 .seller-row{
-  display:grid;grid-template-columns:1fr auto;gap:5px 14px;
+  display:flex;flex-direction:column;gap:6px;
   padding:13px 16px;border:1px solid var(--bdr);border-radius:var(--r-md);
   background:rgba(255,255,255,0.012);transition:border-color .15s,background .15s;
 }
 .seller-row:hover{border-color:var(--bdr-hi);background:rgba(255,255,255,0.025);}
-.sr-owner{font-size:14px;color:var(--txt);font-weight:600;letter-spacing:0.01em;}
-.sr-addr{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan);letter-spacing:0.02em;}
+.sr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+.sr-left{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+.sr-owner{font-size:14px;color:var(--txt);font-weight:600;letter-spacing:0.01em;line-height:1.25;}
+.sr-addr{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan);letter-spacing:0.02em;line-height:1.4;}
+.sr-price{
+  font-family:var(--font-display);font-size:22px;color:var(--acid);
+  text-shadow:0 0 8px var(--acid-glow);line-height:1;flex-shrink:0;letter-spacing:0.02em;
+}
 .sr-phone{
   font-family:var(--font-mono);font-size:12px;color:var(--txt-2);letter-spacing:0.04em;
-  grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:4px;padding-top:8px;border-top:1px solid var(--bdr);
 }
 .sr-phone a{color:var(--acid);text-decoration:none;border-bottom:1px dashed rgba(200,255,0,0.35);}
-.sr-phone a:hover{color:var(--acid);border-bottom-color:var(--acid);}
+.sr-phone a:hover{border-bottom-color:var(--acid);}
 .sr-meta-pill{
   font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.22em;text-transform:uppercase;
   padding:3px 9px;border-radius:99px;border:1px solid currentColor;
@@ -748,12 +755,7 @@ svg.ring{transform:rotate(-90deg);width:210px;height:210px;display:block;filter:
 .sr-meta-pill.s-foreclosure{color:var(--red);}
 .sr-meta-pill.s-scrape{color:var(--cyan);}
 .sr-meta-pill.s-craigslist{color:var(--pur);}
-.sr-price{
-  font-family:var(--font-display);font-size:20px;color:var(--acid);
-  text-shadow:0 0 8px var(--acid-glow);align-self:start;
-  grid-row:1/span 2;justify-self:end;line-height:1;
-}
-.sr-listed{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;}
+.sr-listed{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;margin-left:auto;}
 .sellers-list .empty-row{
   padding:32px 14px;text-align:center;color:var(--muted);font-style:italic;
   border:1px dashed var(--bdr);border-radius:var(--r-md);
@@ -2927,9 +2929,13 @@ function renderSellersList(name){
     var src=(s.source||'').toLowerCase();
     var tel=(s.phone||'').replace(/[^+\d]/g,'');
     row.innerHTML=
-      '<div class="sr-owner">'+escapeHtml(s.owner||'OWNER OF RECORD')+'</div>'+
-      '<div class="sr-price">$'+Math.round((s.price||0)/1000)+'K</div>'+
-      '<div class="sr-addr">'+escapeHtml(s.street||'')+(s.city?' · '+escapeHtml(s.city):'')+'</div>'+
+      '<div class="sr-top">'+
+        '<div class="sr-left">'+
+          '<div class="sr-owner">'+escapeHtml(s.owner||'OWNER OF RECORD')+'</div>'+
+          '<div class="sr-addr">'+escapeHtml(s.street||'')+(s.city?' · '+escapeHtml(s.city):'')+'</div>'+
+        '</div>'+
+        '<div class="sr-price">$'+Math.round((s.price||0)/1000)+'K</div>'+
+      '</div>'+
       '<div class="sr-phone">'+
         '<a href="tel:'+tel+'">'+escapeHtml(s.phone||'—')+'</a>'+
         '<span class="sr-meta-pill s-'+src+'">'+src.toUpperCase()+'</span>'+
