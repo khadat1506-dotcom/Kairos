@@ -684,27 +684,28 @@ svg.ring{transform:rotate(-90deg);width:210px;height:210px;display:block;filter:
 }
 .back-tx:hover{border-color:var(--cyan);background:rgba(126,224,255,0.06);}
 .map-wrap{
-  position:relative;flex:1;min-height:520px;
+  position:relative;flex:1;min-height:640px;
   border:1px solid var(--bdr);border-radius:var(--r-md);
-  background:radial-gradient(ellipse at 30% 30%,rgba(200,255,0,0.025),rgba(0,0,0,0) 60%),rgba(0,0,0,0.18);
+  background:radial-gradient(ellipse at 30% 30%,rgba(200,255,0,0.03),rgba(0,0,0,0) 60%),rgba(0,0,0,0.18);
   overflow:hidden;
 }
-#tx-map{display:block;width:100%;height:100%;min-height:520px;}
+#tx-map{display:block;width:100%;height:100%;min-height:640px;}
 .county{
   fill:rgba(126,224,255,0.06);
-  stroke:rgba(255,255,255,0.18);
-  stroke-width:0.012;
+  stroke:rgba(255,255,255,0.55);
+  stroke-width:1.2;
+  stroke-linejoin:round;
   vector-effect:non-scaling-stroke;
-  transition:fill .25s ease,stroke .15s ease;
+  transition:fill .25s ease,stroke .15s ease,stroke-width .15s ease;
   cursor:pointer;
 }
-.county:hover{stroke:var(--acid);stroke-width:0.025;}
-.county.active{stroke:var(--acid);stroke-width:0.04;fill:var(--acid-faint);}
-.county.heat-1{fill:rgba(200,255,0,0.08);}
-.county.heat-2{fill:rgba(200,255,0,0.18);}
-.county.heat-3{fill:rgba(200,255,0,0.32);}
-.county.heat-4{fill:rgba(200,255,0,0.50);}
-.county.heat-5{fill:rgba(200,255,0,0.72);}
+.county:hover{stroke:var(--acid);stroke-width:2.2;filter:drop-shadow(0 0 4px var(--acid-glow));}
+.county.active{stroke:var(--acid);stroke-width:2.8;fill:var(--acid-faint);filter:drop-shadow(0 0 6px var(--acid-glow));}
+.county.heat-1{fill:rgba(200,255,0,0.10);}
+.county.heat-2{fill:rgba(200,255,0,0.22);}
+.county.heat-3{fill:rgba(200,255,0,0.36);}
+.county.heat-4{fill:rgba(200,255,0,0.54);}
+.county.heat-5{fill:rgba(200,255,0,0.76);}
 .active-county-panel{
   position:absolute;left:14px;bottom:14px;
   padding:11px 16px;border:1px solid var(--bdr-hi);border-radius:var(--r-md);
@@ -713,8 +714,52 @@ svg.ring{transform:rotate(-90deg);width:210px;height:210px;display:block;filter:
 }
 .acp-name{font-family:var(--font-display);font-size:22px;color:var(--acid);letter-spacing:0.05em;text-shadow:0 0 10px var(--acid-glow);line-height:1;}
 .acp-meta{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-top:5px;}
+
+/* Sellers list view (swaps in for the map when a county is clicked) */
+.sellers-pane{
+  flex:1;min-height:640px;display:flex;flex-direction:column;
+  border:1px solid var(--bdr);border-radius:var(--r-md);
+  background:rgba(0,0,0,0.18);overflow:hidden;
+}
+.sellers-list{
+  flex:1;overflow-y:auto;padding:14px 14px 18px;
+  display:flex;flex-direction:column;gap:9px;
+}
+.seller-row{
+  display:grid;grid-template-columns:1fr auto;gap:5px 14px;
+  padding:13px 16px;border:1px solid var(--bdr);border-radius:var(--r-md);
+  background:rgba(255,255,255,0.012);transition:border-color .15s,background .15s;
+}
+.seller-row:hover{border-color:var(--bdr-hi);background:rgba(255,255,255,0.025);}
+.sr-owner{font-size:14px;color:var(--txt);font-weight:600;letter-spacing:0.01em;}
+.sr-addr{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan);letter-spacing:0.02em;}
+.sr-phone{
+  font-family:var(--font-mono);font-size:12px;color:var(--txt-2);letter-spacing:0.04em;
+  grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.sr-phone a{color:var(--acid);text-decoration:none;border-bottom:1px dashed rgba(200,255,0,0.35);}
+.sr-phone a:hover{color:var(--acid);border-bottom-color:var(--acid);}
+.sr-meta-pill{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.22em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;border:1px solid currentColor;
+}
+.sr-meta-pill.s-fsbo{color:var(--ylw);}
+.sr-meta-pill.s-deed{color:var(--acid);}
+.sr-meta-pill.s-foreclosure{color:var(--red);}
+.sr-meta-pill.s-scrape{color:var(--cyan);}
+.sr-meta-pill.s-craigslist{color:var(--pur);}
+.sr-price{
+  font-family:var(--font-display);font-size:20px;color:var(--acid);
+  text-shadow:0 0 8px var(--acid-glow);align-self:start;
+  grid-row:1/span 2;justify-self:end;line-height:1;
+}
+.sr-listed{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;}
+.sellers-list .empty-row{
+  padding:32px 14px;text-align:center;color:var(--muted);font-style:italic;
+  border:1px dashed var(--bdr);border-radius:var(--r-md);
+}
 @media(max-width:980px){
-  .map-wrap,#tx-map{min-height:380px;}
+  .map-wrap,#tx-map,.sellers-pane{min-height:420px;}
   .roster-list{max-height:360px;}
 }
 
@@ -1497,22 +1542,25 @@ button.tbadge:hover{filter:brightness(1.4);transform:scale(1.06);box-shadow:0 0 
       <div class="map-head">
         <div class="map-titlebar">
           <div class="map-num" data-anim="0" id="tg-sell-count">0</div>
-          <div class="map-lbl">SELLERS · 254 COUNTIES</div>
+          <div class="map-lbl" id="map-lbl">SELLERS · 254 COUNTIES</div>
         </div>
         <div class="map-controls">
-          <div class="heat-toggle" role="tablist" aria-label="Heat metric">
+          <div class="heat-toggle" id="heat-toggle" role="tablist" aria-label="Heat metric">
             <button type="button" class="ht active" data-heat="ratio" onclick="setHeatMode('ratio')">RATIO</button>
             <button type="button" class="ht" data-heat="count" onclick="setHeatMode('count')">COUNT</button>
           </div>
-          <button type="button" class="back-tx" id="back-tx" onclick="resetCountyZoom()" aria-label="Reset zoom to full Texas" style="display:none">← ALL TEXAS</button>
+          <button type="button" class="back-tx" id="back-tx" onclick="resetToMap()" aria-label="Back to the Texas map" style="display:none">← TEXAS MAP</button>
         </div>
       </div>
-      <div class="map-wrap">
-        <svg id="tx-map" viewBox="-107 -36.7 14 11" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Texas counties heat map"></svg>
+      <div class="map-wrap" id="map-wrap">
+        <svg id="tx-map" viewBox="-106.85 -36.65 13.4 10.95" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Texas counties heat map"></svg>
         <div class="active-county-panel" id="active-county-panel" aria-live="polite">
           <div class="acp-name" id="acp-name">—</div>
           <div class="acp-meta" id="acp-meta">Click a county to drill in</div>
         </div>
+      </div>
+      <div class="sellers-pane" id="sellers-pane" style="display:none" aria-live="polite">
+        <div class="sellers-list" id="sellers-list"></div>
       </div>
     </div>
 
@@ -2539,20 +2587,175 @@ function animateRevBars(){
 // ═══════════════════════════════════════════════════
 // TARGET (buyers + Texas county map)
 // ═══════════════════════════════════════════════════
-// Hardcoded county-level seller counts for chunk 1. Replaced by Supabase reads in chunk 2.
-// Loose distribution biased toward metros so the heat layer isn't dead-flat.
-var SAMPLE_SELLERS={
-  Harris:54, Dallas:41, Bexar:33, Travis:28, Tarrant:31, Collin:22, Denton:18, 'El Paso':19,
-  Hidalgo:24, Williamson:16, 'Fort Bend':14, Brazoria:11, Galveston:9, Montgomery:13,
-  Bell:10, Nueces:12, Lubbock:8, McLennan:7, Smith:6, Webb:11, Cameron:9, Ector:5,
-  Midland:6, Potter:4, Randall:3, Brazos:5, Comal:4, Guadalupe:4, Johnson:3, Parker:3,
-  Hays:5, Kaufman:3, Rockwall:2, Wise:2, Ellis:4, Hunt:3, Grayson:4, Bowie:2, Gregg:3,
-  Angelina:2, Jefferson:5, Orange:2, Hardin:1, Jasper:1
-};
+// Sample seller listings (chunk-1 placeholder, swapped for Supabase rows in chunk 2).
+// 149 rows biased toward metros so the heat layer + county detail stay populated.
+var SAMPLE_SELLERS=[
+  {owner:"Amanda Carter", street:"6501 Pioneer Pl", city:"Baytown", county:"Harris", phone:"+1 713 555 5404", price:392000, listed:"2026-03-30", source:"fsbo"},
+  {owner:"Amanda Torres", street:"6204 Pioneer Pl", city:"Katy", county:"Harris", phone:"+1 713 555 8624", price:204000, listed:"2026-05-04", source:"foreclosure"},
+  {owner:"Jason Cruz", street:"3559 Crepe Myrtle Dr", city:"Katy", county:"Harris", phone:"+1 713 555 1238", price:370000, listed:"2026-03-31", source:"scrape"},
+  {owner:"William Rogers", street:"7155 Buffalo Pass", city:"Tomball", county:"Harris", phone:"+1 713 555 5809", price:479000, listed:"2026-04-25", source:"foreclosure"},
+  {owner:"Karen Green", street:"7583 Wagon Trail", city:"Tomball", county:"Harris", phone:"+1 713 555 4595", price:234000, listed:"2026-03-19", source:"scrape"},
+  {owner:"Angela Baker", street:"2361 Salt Grass Ln", city:"Katy", county:"Harris", phone:"+1 713 555 5986", price:451000, listed:"2026-04-07", source:"fsbo"},
+  {owner:"George Lopez", street:"9467 Maple St", city:"Houston", county:"Harris", phone:"+1 713 555 3077", price:121000, listed:"2026-05-18", source:"craigslist"},
+  {owner:"Thomas Wood", street:"9607 Yaupon St", city:"Tomball", county:"Harris", phone:"+1 713 555 9278", price:469000, listed:"2026-04-24", source:"fsbo"},
+  {owner:"Sarah Jackson", street:"7611 Lone Star Pkwy", city:"Humble", county:"Harris", phone:"+1 713 555 7316", price:494000, listed:"2026-04-12", source:"craigslist"},
+  {owner:"Gary Wright", street:"373 Mesquite Trl", city:"Houston", county:"Harris", phone:"+1 713 555 6326", price:92000, listed:"2026-04-24", source:"foreclosure"},
+  {owner:"Larry Ramos", street:"2934 Bluebonnet Dr", city:"Pasadena", county:"Harris", phone:"+1 713 555 5390", price:292000, listed:"2026-06-01", source:"deed"},
+  {owner:"Sandra Lewis", street:"7698 Stetson Way", city:"Humble", county:"Harris", phone:"+1 713 555 5240", price:224000, listed:"2026-05-26", source:"deed"},
+  {owner:"Brian Edwards", street:"4291 Pioneer Pl", city:"Katy", county:"Harris", phone:"+1 713 555 5805", price:431000, listed:"2026-05-07", source:"scrape"},
+  {owner:"William Edwards", street:"1007 Spurs Ct", city:"Houston", county:"Harris", phone:"+1 713 555 1455", price:208000, listed:"2026-04-08", source:"scrape"},
+  {owner:"Larry Watson", street:"7330 Maple St", city:"Garland", county:"Dallas", phone:"+1 214 555 9435", price:431000, listed:"2026-05-27", source:"craigslist"},
+  {owner:"Larry Phillips", street:"3805 Elm Ave", city:"Mesquite", county:"Dallas", phone:"+1 214 555 3873", price:176000, listed:"2026-03-06", source:"deed"},
+  {owner:"Donna Jimenez", street:"9396 Sage Ct", city:"Mesquite", county:"Dallas", phone:"+1 214 555 6152", price:318000, listed:"2026-05-13", source:"fsbo"},
+  {owner:"Donald Jimenez", street:"3295 Crepe Myrtle Dr", city:"Garland", county:"Dallas", phone:"+1 214 555 3997", price:389000, listed:"2026-04-23", source:"scrape"},
+  {owner:"Jonathan Smith", street:"8925 Big Tex Blvd", city:"Irving", county:"Dallas", phone:"+1 214 555 7640", price:277000, listed:"2026-04-06", source:"foreclosure"},
+  {owner:"Sandra Torres", street:"3032 Caliche Rd", city:"Irving", county:"Dallas", phone:"+1 214 555 6316", price:140000, listed:"2026-03-07", source:"craigslist"},
+  {owner:"Andrew Gonzalez", street:"6542 Bluebonnet Dr", city:"Garland", county:"Dallas", phone:"+1 214 555 4100", price:85000, listed:"2026-03-09", source:"foreclosure"},
+  {owner:"Gregory Gonzalez", street:"9928 Cattle Drive", city:"Irving", county:"Dallas", phone:"+1 214 555 7989", price:168000, listed:"2026-05-28", source:"foreclosure"},
+  {owner:"Justin Gutierrez", street:"5126 Crepe Myrtle Dr", city:"Mesquite", county:"Dallas", phone:"+1 214 555 2992", price:212000, listed:"2026-05-09", source:"craigslist"},
+  {owner:"Anna Young", street:"6469 Cedar Ln", city:"Garland", county:"Dallas", phone:"+1 214 555 0557", price:92000, listed:"2026-03-24", source:"foreclosure"},
+  {owner:"Anthony Davis", street:"6989 Reata Rd", city:"Carrollton", county:"Dallas", phone:"+1 214 555 5523", price:458000, listed:"2026-03-15", source:"scrape"},
+  {owner:"Paul Myers", street:"6409 Stetson Way", city:"Live Oak", county:"Bexar", phone:"+1 210 555 3395", price:443000, listed:"2026-05-10", source:"foreclosure"},
+  {owner:"Jeffrey Bailey", street:"3819 Yaupon St", city:"Leon Valley", county:"Bexar", phone:"+1 210 555 8209", price:130000, listed:"2026-05-18", source:"deed"},
+  {owner:"Andrew Brooks", street:"1790 Salt Grass Ln", city:"Leon Valley", county:"Bexar", phone:"+1 210 555 1735", price:430000, listed:"2026-03-18", source:"fsbo"},
+  {owner:"James Stewart", street:"9291 Saddle Ridge", city:"Helotes", county:"Bexar", phone:"+1 210 555 4486", price:364000, listed:"2026-04-25", source:"deed"},
+  {owner:"Kathleen Chavez", street:"8776 Main St", city:"Helotes", county:"Bexar", phone:"+1 210 555 6338", price:263000, listed:"2026-05-13", source:"deed"},
+  {owner:"Stephen Martinez", street:"3713 Walnut Hollow", city:"Universal City", county:"Bexar", phone:"+1 210 555 8144", price:467000, listed:"2026-03-17", source:"scrape"},
+  {owner:"Ryan Smith", street:"7660 Yaupon St", city:"Universal City", county:"Bexar", phone:"+1 210 555 5817", price:101000, listed:"2026-05-07", source:"deed"},
+  {owner:"Emily Wood", street:"7778 Yaupon St", city:"Leon Valley", county:"Bexar", phone:"+1 210 555 2576", price:101000, listed:"2026-05-02", source:"foreclosure"},
+  {owner:"Larry Morris", street:"9899 Cedar Ln", city:"Leon Valley", county:"Bexar", phone:"+1 210 555 9901", price:402000, listed:"2026-03-25", source:"scrape"},
+  {owner:"Sandra Thompson", street:"7782 Crepe Myrtle Dr", city:"Lago Vista", county:"Travis", phone:"+1 512 555 9944", price:398000, listed:"2026-03-12", source:"deed"},
+  {owner:"Brenda Collins", street:"3174 Maple St", city:"West Lake Hills", county:"Travis", phone:"+1 512 555 5322", price:287000, listed:"2026-05-13", source:"scrape"},
+  {owner:"Donald Scott", street:"9159 Yaupon St", city:"Manor", county:"Travis", phone:"+1 512 555 7173", price:473000, listed:"2026-05-11", source:"fsbo"},
+  {owner:"Thomas Scott", street:"3322 Cattle Drive", city:"Austin", county:"Travis", phone:"+1 512 555 0453", price:454000, listed:"2026-03-16", source:"craigslist"},
+  {owner:"Joshua Carter", street:"5638 Coyote Crk", city:"Manor", county:"Travis", phone:"+1 512 555 1067", price:107000, listed:"2026-03-24", source:"deed"},
+  {owner:"Benjamin Campbell", street:"1747 Yaupon St", city:"West Lake Hills", county:"Travis", phone:"+1 512 555 0408", price:432000, listed:"2026-05-22", source:"fsbo"},
+  {owner:"Frank James", street:"9151 Oak St", city:"Pflugerville", county:"Travis", phone:"+1 512 555 8189", price:442000, listed:"2026-04-10", source:"scrape"},
+  {owner:"Ashley Richardson", street:"8709 Mockingbird Ln", city:"Austin", county:"Travis", phone:"+1 512 555 8713", price:276000, listed:"2026-03-22", source:"deed"},
+  {owner:"Maria Alvarez", street:"1689 Oak St", city:"Hurst", county:"Tarrant", phone:"+1 817 555 4024", price:237000, listed:"2026-05-21", source:"craigslist"},
+  {owner:"Gary Peterson", street:"6644 Oak St", city:"Fort Worth", county:"Tarrant", phone:"+1 817 555 0536", price:429000, listed:"2026-03-30", source:"foreclosure"},
+  {owner:"Betty Torres", street:"2293 Lone Mesa Dr", city:"Grapevine", county:"Tarrant", phone:"+1 817 555 4578", price:130000, listed:"2026-04-22", source:"fsbo"},
+  {owner:"George Watson", street:"5593 Lone Star Pkwy", city:"Grapevine", county:"Tarrant", phone:"+1 817 555 8839", price:269000, listed:"2026-05-17", source:"fsbo"},
+  {owner:"Ashley Evans", street:"158 Mockingbird Ln", city:"Mansfield", county:"Tarrant", phone:"+1 817 555 3398", price:154000, listed:"2026-05-05", source:"foreclosure"},
+  {owner:"Jessica Reed", street:"3595 Live Oak Ln", city:"Mansfield", county:"Tarrant", phone:"+1 817 555 4490", price:158000, listed:"2026-03-30", source:"foreclosure"},
+  {owner:"Samantha Lopez", street:"1605 Yaupon St", city:"Euless", county:"Tarrant", phone:"+1 817 555 5929", price:128000, listed:"2026-03-10", source:"scrape"},
+  {owner:"Scott Mitchell", street:"1461 Lone Mesa Dr", city:"Fort Worth", county:"Tarrant", phone:"+1 817 555 6016", price:176000, listed:"2026-04-18", source:"deed"},
+  {owner:"Thomas Martinez", street:"8976 Lone Mesa Dr", city:"Mansfield", county:"Tarrant", phone:"+1 817 555 8266", price:152000, listed:"2026-04-17", source:"fsbo"},
+  {owner:"Rachel Chavez", street:"9854 Wagon Trail", city:"Anna", county:"Collin", phone:"+1 469 555 8396", price:298000, listed:"2026-04-25", source:"deed"},
+  {owner:"Kevin Nguyen", street:"7581 Wagon Trail", city:"Anna", county:"Collin", phone:"+1 469 555 6169", price:393000, listed:"2026-06-02", source:"deed"},
+  {owner:"Mark White", street:"7211 Magnolia Blvd", city:"Frisco", county:"Collin", phone:"+1 469 555 2083", price:375000, listed:"2026-05-12", source:"foreclosure"},
+  {owner:"Helen Moore", street:"8269 Pecan Dr", city:"McKinney", county:"Collin", phone:"+1 469 555 0814", price:168000, listed:"2026-05-24", source:"scrape"},
+  {owner:"Samuel Parker", street:"3491 Mockingbird Ln", city:"Murphy", county:"Collin", phone:"+1 469 555 4792", price:457000, listed:"2026-03-12", source:"scrape"},
+  {owner:"Scott Murphy", street:"7135 Lariat Ln", city:"Murphy", county:"Collin", phone:"+1 469 555 8142", price:406000, listed:"2026-05-21", source:"deed"},
+  {owner:"Thomas Reyes", street:"2463 Stetson Way", city:"The Colony", county:"Denton", phone:"+1 940 555 6413", price:476000, listed:"2026-04-29", source:"fsbo"},
+  {owner:"Steven Peterson", street:"9804 Pioneer Pl", city:"Little Elm", county:"Denton", phone:"+1 940 555 9526", price:337000, listed:"2026-05-28", source:"craigslist"},
+  {owner:"Larry Wright", street:"4720 Cypress Way", city:"The Colony", county:"Denton", phone:"+1 940 555 7527", price:433000, listed:"2026-04-28", source:"craigslist"},
+  {owner:"Charles Adams", street:"6349 Magnolia Blvd", city:"Little Elm", county:"Denton", phone:"+1 940 555 2056", price:297000, listed:"2026-05-30", source:"scrape"},
+  {owner:"Ryan Taylor", street:"5322 Bridle Path", city:"Pilot Point", county:"Denton", phone:"+1 940 555 4346", price:281000, listed:"2026-05-27", source:"fsbo"},
+  {owner:"Ryan Diaz", street:"9561 Spurs Ct", city:"Vinton", county:"El Paso", phone:"+1 915 555 3297", price:398000, listed:"2026-04-29", source:"fsbo"},
+  {owner:"Kenneth Morales", street:"9314 Lone Mesa Dr", city:"El Paso", county:"El Paso", phone:"+1 915 555 1193", price:426000, listed:"2026-03-21", source:"deed"},
+  {owner:"Sarah Thompson", street:"4378 Elm Ave", city:"Vinton", county:"El Paso", phone:"+1 915 555 1291", price:199000, listed:"2026-05-06", source:"deed"},
+  {owner:"Kevin Patel", street:"7307 Stetson Way", city:"Socorro", county:"El Paso", phone:"+1 915 555 5832", price:212000, listed:"2026-03-20", source:"scrape"},
+  {owner:"Patricia Ward", street:"4349 Wagon Trail", city:"Horizon City", county:"El Paso", phone:"+1 915 555 8185", price:101000, listed:"2026-05-17", source:"fsbo"},
+  {owner:"Jason Hernandez", street:"1343 Buffalo Pass", city:"Weslaco", county:"Hidalgo", phone:"+1 956 555 3326", price:355000, listed:"2026-05-22", source:"foreclosure"},
+  {owner:"Deborah Phillips", street:"6418 Yaupon St", city:"San Juan", county:"Hidalgo", phone:"+1 956 555 3929", price:259000, listed:"2026-03-16", source:"deed"},
+  {owner:"Joseph Young", street:"1916 Yaupon St", city:"McAllen", county:"Hidalgo", phone:"+1 956 555 2431", price:169000, listed:"2026-05-14", source:"foreclosure"},
+  {owner:"Ashley Parker", street:"8286 Cypress Way", city:"McAllen", county:"Hidalgo", phone:"+1 956 555 9505", price:375000, listed:"2026-04-18", source:"scrape"},
+  {owner:"Samantha Thompson", street:"7654 Coyote Crk", city:"Pharr", county:"Hidalgo", phone:"+1 956 555 4420", price:183000, listed:"2026-04-21", source:"foreclosure"},
+  {owner:"Nicole Kelly", street:"7836 Sage Brush Rd", city:"Pharr", county:"Hidalgo", phone:"+1 956 555 8238", price:471000, listed:"2026-04-15", source:"craigslist"},
+  {owner:"Melissa Brown", street:"1166 Cedar Ln", city:"Hutto", county:"Williamson", phone:"+1 512 555 9796", price:454000, listed:"2026-05-09", source:"craigslist"},
+  {owner:"Gary Wood", street:"7405 Stetson Way", city:"Round Rock", county:"Williamson", phone:"+1 512 555 6341", price:468000, listed:"2026-05-12", source:"deed"},
+  {owner:"Anna Rogers", street:"569 Caliche Rd", city:"Hutto", county:"Williamson", phone:"+1 512 555 8645", price:364000, listed:"2026-05-15", source:"foreclosure"},
+  {owner:"John Watson", street:"2832 Mockingbird Ln", city:"Georgetown", county:"Williamson", phone:"+1 512 555 4931", price:449000, listed:"2026-03-14", source:"craigslist"},
+  {owner:"Kenneth Thompson", street:"6249 Cattle Drive", city:"Leander", county:"Williamson", phone:"+1 512 555 8909", price:124000, listed:"2026-03-15", source:"fsbo"},
+  {owner:"Donna Nelson", street:"1051 Hill Country Rd", city:"Sugar Land", county:"Fort Bend", phone:"+1 281 555 3922", price:266000, listed:"2026-03-22", source:"scrape"},
+  {owner:"Jonathan Cruz", street:"2270 Cattle Drive", city:"Katy", county:"Fort Bend", phone:"+1 281 555 4664", price:312000, listed:"2026-03-22", source:"deed"},
+  {owner:"Margaret Parker", street:"4162 Buffalo Pass", city:"Rosenberg", county:"Fort Bend", phone:"+1 281 555 0167", price:188000, listed:"2026-04-18", source:"craigslist"},
+  {owner:"Andrew Gonzalez", street:"9784 Oak St", city:"Richmond", county:"Fort Bend", phone:"+1 281 555 7765", price:442000, listed:"2026-03-15", source:"scrape"},
+  {owner:"Larry Ross", street:"4007 Sage Ct", city:"Alvin", county:"Brazoria", phone:"+1 979 555 8984", price:290000, listed:"2026-05-13", source:"foreclosure"},
+  {owner:"Scott Williams", street:"4298 Mesquite Trl", city:"Alvin", county:"Brazoria", phone:"+1 979 555 5290", price:104000, listed:"2026-03-19", source:"craigslist"},
+  {owner:"George Ross", street:"3558 Main St", city:"Freeport", county:"Brazoria", phone:"+1 979 555 6981", price:460000, listed:"2026-05-15", source:"deed"},
+  {owner:"Jonathan Martinez", street:"752 Sage Brush Rd", city:"Texas City", county:"Galveston", phone:"+1 409 555 2122", price:122000, listed:"2026-03-31", source:"scrape"},
+  {owner:"John Myers", street:"4524 Bluebonnet Dr", city:"La Marque", county:"Galveston", phone:"+1 409 555 6616", price:362000, listed:"2026-03-18", source:"deed"},
+  {owner:"Margaret Reyes", street:"1191 Yaupon St", city:"Dickinson", county:"Galveston", phone:"+1 409 555 0220", price:176000, listed:"2026-04-17", source:"deed"},
+  {owner:"Barbara Flores", street:"2919 Sage Ct", city:"The Woodlands", county:"Montgomery", phone:"+1 936 555 4653", price:321000, listed:"2026-03-30", source:"foreclosure"},
+  {owner:"Daniel Harris", street:"5057 Magnolia Blvd", city:"Splendora", county:"Montgomery", phone:"+1 936 555 2548", price:380000, listed:"2026-03-24", source:"foreclosure"},
+  {owner:"Catherine Richardson", street:"4677 Sunset Blvd", city:"Magnolia", county:"Montgomery", phone:"+1 936 555 8472", price:164000, listed:"2026-03-10", source:"craigslist"},
+  {owner:"William Anderson", street:"4130 Lariat Ln", city:"Montgomery", county:"Montgomery", phone:"+1 936 555 5148", price:203000, listed:"2026-04-03", source:"deed"},
+  {owner:"Deborah Mendoza", street:"1353 Sage Brush Rd", city:"Copperas Cove", county:"Bell", phone:"+1 254 555 6642", price:261000, listed:"2026-05-24", source:"fsbo"},
+  {owner:"Benjamin Parker", street:"9033 Stetson Way", city:"Harker Heights", county:"Bell", phone:"+1 254 555 0455", price:366000, listed:"2026-03-06", source:"craigslist"},
+  {owner:"Eric Morris", street:"4560 Mockingbird Ln", city:"Salado", county:"Bell", phone:"+1 254 555 7281", price:382000, listed:"2026-03-19", source:"craigslist"},
+  {owner:"Maria Adams", street:"1965 Walnut Hollow", city:"Corpus Christi", county:"Nueces", phone:"+1 361 555 6941", price:151000, listed:"2026-05-26", source:"scrape"},
+  {owner:"Dennis Flores", street:"3804 Wagon Trail", city:"Bishop", county:"Nueces", phone:"+1 361 555 3975", price:278000, listed:"2026-04-03", source:"foreclosure"},
+  {owner:"Benjamin Scott", street:"1808 Coyote Crk", city:"Robstown", county:"Nueces", phone:"+1 361 555 5679", price:362000, listed:"2026-03-15", source:"scrape"},
+  {owner:"Alexander Harris", street:"2284 Lone Star Pkwy", city:"Slaton", county:"Lubbock", phone:"+1 806 555 1797", price:277000, listed:"2026-05-04", source:"fsbo"},
+  {owner:"Rebecca Kim", street:"7760 Pecan Dr", city:"Slaton", county:"Lubbock", phone:"+1 806 555 3023", price:259000, listed:"2026-04-19", source:"craigslist"},
+  {owner:"Patrick Gutierrez", street:"693 Salt Grass Ln", city:"Wolfforth", county:"Lubbock", phone:"+1 806 555 8828", price:335000, listed:"2026-04-30", source:"scrape"},
+  {owner:"Christine Morris", street:"8578 Sage Brush Rd", city:"Woodway", county:"McLennan", phone:"+1 254 555 3568", price:274000, listed:"2026-04-12", source:"craigslist"},
+  {owner:"Thomas Phillips", street:"4952 Crepe Myrtle Dr", city:"Robinson", county:"McLennan", phone:"+1 254 555 1374", price:276000, listed:"2026-04-19", source:"craigslist"},
+  {owner:"Donna Clark", street:"4749 Liberty Hill", city:"Troup", county:"Smith", phone:"+1 903 555 8910", price:205000, listed:"2026-03-24", source:"craigslist"},
+  {owner:"Rachel Morris", street:"9043 Live Oak Ln", city:"Troup", county:"Smith", phone:"+1 903 555 9772", price:277000, listed:"2026-03-22", source:"scrape"},
+  {owner:"Linda Hall", street:"9162 Stetson Way", city:"El Cenizo", county:"Webb", phone:"+1 956 555 8665", price:478000, listed:"2026-05-08", source:"deed"},
+  {owner:"Kenneth Rodriguez", street:"8723 Walnut Hollow", city:"Laredo", county:"Webb", phone:"+1 956 555 1045", price:167000, listed:"2026-05-13", source:"foreclosure"},
+  {owner:"Edward Long", street:"4117 Maple St", city:"El Cenizo", county:"Webb", phone:"+1 956 555 9292", price:324000, listed:"2026-05-27", source:"scrape"},
+  {owner:"Edward Jones", street:"784 Caliche Rd", city:"Los Fresnos", county:"Cameron", phone:"+1 956 555 8957", price:160000, listed:"2026-04-29", source:"deed"},
+  {owner:"Michael Parker", street:"4943 Oak St", city:"Brownsville", county:"Cameron", phone:"+1 956 555 8510", price:342000, listed:"2026-05-13", source:"deed"},
+  {owner:"Brian Garcia", street:"7489 Saddle Ridge", city:"Goldsmith", county:"Ector", phone:"+1 432 555 9552", price:425000, listed:"2026-05-23", source:"scrape"},
+  {owner:"Raymond Jones", street:"3740 Pioneer Pl", city:"Odessa", county:"Ector", phone:"+1 432 555 8737", price:287000, listed:"2026-03-20", source:"craigslist"},
+  {owner:"Stephen Peterson", street:"1753 Cypress Way", city:"Greenwood", county:"Midland", phone:"+1 432 555 7144", price:357000, listed:"2026-05-09", source:"scrape"},
+  {owner:"Donna Chavez", street:"4805 Maple St", city:"Midland", county:"Midland", phone:"+1 432 555 9303", price:429000, listed:"2026-05-19", source:"deed"},
+  {owner:"Nicholas Scott", street:"3116 Pioneer Pl", city:"College Station", county:"Brazos", phone:"+1 979 555 7352", price:415000, listed:"2026-04-30", source:"fsbo"},
+  {owner:"Larry Lee", street:"5843 Lariat Ln", city:"College Station", county:"Brazos", phone:"+1 979 555 3988", price:416000, listed:"2026-05-26", source:"deed"},
+  {owner:"Jonathan Foster", street:"3929 Sage Brush Rd", city:"New Braunfels", county:"Comal", phone:"+1 830 555 2946", price:88000, listed:"2026-05-29", source:"craigslist"},
+  {owner:"Rachel Johnson", street:"137 Sage Ct", city:"Canyon Lake", county:"Comal", phone:"+1 830 555 1689", price:131000, listed:"2026-04-03", source:"deed"},
+  {owner:"David Turner", street:"2545 Cattle Baron Dr", city:"Seguin", county:"Guadalupe", phone:"+1 830 555 1195", price:387000, listed:"2026-05-29", source:"deed"},
+  {owner:"Brenda Adams", street:"6460 Liberty Hill", city:"Marion", county:"Guadalupe", phone:"+1 830 555 9165", price:431000, listed:"2026-04-16", source:"foreclosure"},
+  {owner:"Lisa Johnson", street:"9076 Caliche Rd", city:"San Marcos", county:"Hays", phone:"+1 512 555 5792", price:274000, listed:"2026-04-21", source:"deed"},
+  {owner:"Anna Adams", street:"1444 Sage Brush Rd", city:"Buda", county:"Hays", phone:"+1 512 555 3964", price:313000, listed:"2026-05-04", source:"fsbo"},
+  {owner:"Linda Turner", street:"9330 Mockingbird Ln", city:"Crandall", county:"Kaufman", phone:"+1 972 555 7751", price:348000, listed:"2026-03-27", source:"fsbo"},
+  {owner:"Brenda Ross", street:"818 Sage Brush Rd", city:"Forney", county:"Kaufman", phone:"+1 972 555 0390", price:158000, listed:"2026-06-03", source:"scrape"},
+  {owner:"Stephen Rogers", street:"9674 Reata Rd", city:"Midlothian", county:"Ellis", phone:"+1 972 555 5256", price:296000, listed:"2026-04-20", source:"fsbo"},
+  {owner:"Donald Jimenez", street:"3704 Yaupon St", city:"Red Oak", county:"Ellis", phone:"+1 972 555 5918", price:393000, listed:"2026-06-01", source:"fsbo"},
+  {owner:"James Mitchell", street:"9778 Bayou Bend", city:"Greenville", county:"Hunt", phone:"+1 903 555 9128", price:419000, listed:"2026-04-24", source:"fsbo"},
+  {owner:"George Rivera", street:"1670 Liberty Hill", city:"Caddo Mills", county:"Hunt", phone:"+1 903 555 5205", price:151000, listed:"2026-04-15", source:"craigslist"},
+  {owner:"Barbara Castillo", street:"2577 Maple St", city:"Sherman", county:"Grayson", phone:"+1 903 555 0209", price:253000, listed:"2026-04-20", source:"scrape"},
+  {owner:"Gary Hernandez", street:"7456 Cypress Way", city:"Sherman", county:"Grayson", phone:"+1 903 555 5249", price:84000, listed:"2026-05-13", source:"scrape"},
+  {owner:"Virginia Parker", street:"5811 Sage Ct", city:"New Boston", county:"Bowie", phone:"+1 903 555 4814", price:204000, listed:"2026-05-12", source:"fsbo"},
+  {owner:"Samuel Long", street:"832 Pecan Dr", city:"Wake Village", county:"Bowie", phone:"+1 903 555 0342", price:240000, listed:"2026-05-17", source:"deed"},
+  {owner:"Emily Ortiz", street:"4613 Bayou Bend", city:"Kilgore", county:"Gregg", phone:"+1 903 555 5674", price:189000, listed:"2026-04-11", source:"fsbo"},
+  {owner:"Maria Rodriguez", street:"7297 Sage Ct", city:"Kilgore", county:"Gregg", phone:"+1 903 555 4329", price:481000, listed:"2026-03-09", source:"scrape"},
+  {owner:"Jack Kim", street:"653 Main St", city:"Nederland", county:"Jefferson", phone:"+1 409 555 9832", price:273000, listed:"2026-05-13", source:"foreclosure"},
+  {owner:"Jonathan Gray", street:"4639 Crepe Myrtle Dr", city:"Beaumont", county:"Jefferson", phone:"+1 409 555 6582", price:485000, listed:"2026-05-21", source:"scrape"},
+  {owner:"Rachel Edwards", street:"2216 Live Oak Ln", city:"Groves", county:"Jefferson", phone:"+1 409 555 7208", price:93000, listed:"2026-05-14", source:"scrape"},
+  {owner:"Maria Taylor", street:"538 Walnut Hollow", city:"Aledo", county:"Parker", phone:"+1 817 555 5807", price:184000, listed:"2026-04-05", source:"craigslist"},
+  {owner:"Jessica Cook", street:"4339 Lone Star Pkwy", city:"Weatherford", county:"Parker", phone:"+1 817 555 9789", price:154000, listed:"2026-04-11", source:"foreclosure"},
+  {owner:"Barbara Chavez", street:"9190 Hill Country Rd", city:"Burleson", county:"Johnson", phone:"+1 817 555 9586", price:216000, listed:"2026-03-13", source:"deed"},
+  {owner:"Charles Kim", street:"7269 Mockingbird Ln", city:"Alvarado", county:"Johnson", phone:"+1 817 555 3437", price:358000, listed:"2026-04-28", source:"fsbo"},
+  {owner:"Anna Edwards", street:"1942 Saddle Ridge", city:"Decatur", county:"Wise", phone:"+1 940 555 8456", price:314000, listed:"2026-05-02", source:"craigslist"},
+  {owner:"Amy Morgan", street:"9678 Sunset Blvd", city:"Fate", county:"Rockwall", phone:"+1 972 555 4758", price:343000, listed:"2026-04-09", source:"deed"},
+  {owner:"Christopher Richardson", street:"1555 Liberty Hill", city:"Diboll", county:"Angelina", phone:"+1 936 555 1406", price:288000, listed:"2026-04-09", source:"foreclosure"},
+  {owner:"Margaret Watson", street:"7683 Stetson Way", city:"Orange", county:"Orange", phone:"+1 409 555 2600", price:394000, listed:"2026-04-21", source:"deed"},
+  {owner:"Steven Kelly", street:"3440 Lone Mesa Dr", city:"Silsbee", county:"Hardin", phone:"+1 409 555 7132", price:414000, listed:"2026-03-20", source:"craigslist"},
+  {owner:"Carolyn Alvarez", street:"709 Live Oak Ln", city:"Kirbyville", county:"Jasper", phone:"+1 409 555 9129", price:413000, listed:"2026-04-06", source:"fsbo"},
+  {owner:"Richard Mitchell", street:"6276 Sunset Blvd", city:"Amarillo", county:"Randall", phone:"+1 806 555 4210", price:228000, listed:"2026-04-16", source:"deed"},
+  {owner:"Brandon Collins", street:"9644 Pioneer Pl", city:"Amarillo", county:"Potter", phone:"+1 806 555 9809", price:345000, listed:"2026-05-11", source:"foreclosure"},
+];
+
 var LLC_RENEWAL_ISO='2027-01-15';
 
+// Index SAMPLE_SELLERS by county for O(1) per-county lookups.
+var _sellersByCounty=(function(){
+  var m={};
+  for(var i=0;i<SAMPLE_SELLERS.length;i++){
+    var c=SAMPLE_SELLERS[i].county;
+    (m[c]=m[c]||[]).push(SAMPLE_SELLERS[i]);
+  }
+  return m;
+})();
+function sellersIn(name){return _sellersByCounty[name]||[];}
+
 function getCountyStats(name){
-  var sellers=SAMPLE_SELLERS[name]||0;
+  var sellers=sellersIn(name).length;
   var buyers=S.buyers.filter(function(b){return b.county===name;}).length;
   var ratio=buyers===0?(sellers>0?sellers:0):(sellers/buyers);
   return {sellers:sellers, buyers:buyers, ratio:ratio};
@@ -2562,7 +2765,7 @@ function buyerScore(b){
   // Chunk 1 formula: manual*3 + (county sellers as crude proxy for activity).
   // Chunk 2 swaps the proxy for news_30d_count + deed_velocity_30d from Supabase views.
   var manual=b.manual?3:0;
-  var activity=Math.min(5,Math.round((SAMPLE_SELLERS[b.county]||0)/10));
+  var activity=Math.min(5,Math.round(sellersIn(b.county).length/3));
   return manual+activity;
 }
 
@@ -2597,30 +2800,6 @@ function bboxOfFeature(f){
   return [minX,minY,maxX-minX,maxY-minY];
 }
 
-var _vbAnim=null;
-function animateViewBox(svg,toVB,ms){
-  if(_vbAnim){cancelAnimationFrame(_vbAnim);_vbAnim=null;}
-  var cur=svg.viewBox.baseVal;
-  var from=[cur.x,cur.y,cur.width,cur.height];
-  var start=performance.now();
-  function step(now){
-    var k=Math.min(1,(now-start)/ms);
-    var e=k<0.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
-    var v=[
-      from[0]+(toVB[0]-from[0])*e,
-      from[1]+(toVB[1]-from[1])*e,
-      from[2]+(toVB[2]-from[2])*e,
-      from[3]+(toVB[3]-from[3])*e,
-    ];
-    svg.setAttribute('viewBox',v.map(function(n){return n.toFixed(3);}).join(' '));
-    if(k<1)_vbAnim=requestAnimationFrame(step);else _vbAnim=null;
-  }
-  _vbAnim=requestAnimationFrame(step);
-}
-
-var TX_VB_DEFAULT=[-107,-36.7,14,11];
-var _countyBBoxes={};
-
 function renderMap(){
   var svg=$('tx-map');if(!svg)return;
   if(svg.dataset.painted==='1'){applyHeat();return;}
@@ -2634,7 +2813,6 @@ function renderMap(){
   for(var i=0;i<ordered.length;i++){
     var f=ordered[i];
     var name=f.properties.name;
-    _countyBBoxes[name]=bboxOfFeature(f);
     var path=document.createElementNS(ns,'path');
     path.setAttribute('d',geoToPath(f.geometry));
     path.setAttribute('class','county');
@@ -2690,41 +2868,75 @@ function applyHeat(){
 
 function selectCounty(name){
   S.activeCounty=name;
-  var svg=$('tx-map');
-  if(svg&&_countyBBoxes[name]){
-    var b=_countyBBoxes[name];
-    var pad=Math.max(b[2],b[3])*0.35;
-    animateViewBox(svg,[b[0]-pad,b[1]-pad,b[2]+pad*2,b[3]+pad*2],380);
-  }
-  $('back-tx').style.display='';
+  // Swap the right pane: hide map, show sellers list
+  var mw=$('map-wrap'), sp=$('sellers-pane');
+  if(mw)mw.style.display='none';
+  if(sp)sp.style.display='flex';
+  // Swap header controls: heat-toggle out, back-to-map in
+  var ht=$('heat-toggle'); if(ht)ht.style.display='none';
+  var btx=$('back-tx'); if(btx)btx.style.display='';
+  // Header copy now reflects the county
+  var lbl=$('map-lbl'); if(lbl)lbl.textContent=name.toUpperCase()+' COUNTY · SELLERS';
+  // Left-pane filter chip
   var chip=$('filter-chip');if(chip)chip.classList.add('has-filter');
-  var lbl=$('fc-lbl');if(lbl)lbl.textContent=name.toUpperCase();
-  var clr=$('fc-clear');if(clr)clr.style.display='';
-  var s=getCountyStats(name);
-  var acpn=$('acp-name');if(acpn)acpn.textContent=name.toUpperCase();
-  var acpm=$('acp-meta');if(acpm)acpm.textContent=s.sellers+' SELL · '+s.buyers+' BUY · RATIO '+(s.ratio?s.ratio.toFixed(1):'—');
+  var fcl=$('fc-lbl');if(fcl)fcl.textContent=name.toUpperCase();
+  var fclr=$('fc-clear');if(fclr)fclr.style.display='';
   applyHeat();
+  renderSellersList(name);
   renderRoster();
   saveState();
 }
 
-function clearCountyFilter(){
+function resetToMap(){
   S.activeCounty=null;
+  var mw=$('map-wrap'), sp=$('sellers-pane');
+  if(mw)mw.style.display='';
+  if(sp)sp.style.display='none';
+  var ht=$('heat-toggle'); if(ht)ht.style.display='';
+  var btx=$('back-tx'); if(btx)btx.style.display='none';
+  var lbl=$('map-lbl'); if(lbl)lbl.textContent='SELLERS · '+SAMPLE_SELLERS.length+' LOGGED · 254 COUNTIES';
   var chip=$('filter-chip');if(chip)chip.classList.remove('has-filter');
-  var lbl=$('fc-lbl');if(lbl)lbl.textContent='ALL TEXAS';
-  var clr=$('fc-clear');if(clr)clr.style.display='none';
+  var fcl=$('fc-lbl');if(fcl)fcl.textContent='ALL TEXAS';
+  var fclr=$('fc-clear');if(fclr)fclr.style.display='none';
+  var acpn=$('acp-name'); if(acpn)acpn.textContent='—';
+  var acpm=$('acp-meta'); if(acpm)acpm.textContent='Click a county to drill in';
   applyHeat();
   renderRoster();
   saveState();
 }
 
-function resetCountyZoom(){
-  var svg=$('tx-map');
-  if(svg)animateViewBox(svg,TX_VB_DEFAULT,380);
-  $('back-tx').style.display='none';
-  var acpn=$('acp-name');if(acpn)acpn.textContent='—';
-  var acpm=$('acp-meta');if(acpm)acpm.textContent='Click a county to drill in';
-  clearCountyFilter();
+// Back-compat alias - the chip × button still calls clearCountyFilter()
+function clearCountyFilter(){ resetToMap(); }
+
+function renderSellersList(name){
+  var el=$('sellers-list');if(!el)return;
+  var listings=sellersIn(name).slice();
+  listings.sort(function(a,b){return (b.listed||'').localeCompare(a.listed||'');});
+  el.innerHTML='';
+  if(listings.length===0){
+    var empty=document.createElement('div');
+    empty.className='empty-row';
+    empty.textContent='No sellers logged for '+name+' yet';
+    el.appendChild(empty);
+    return;
+  }
+  for(var i=0;i<listings.length;i++){
+    var s=listings[i];
+    var row=document.createElement('div');
+    row.className='seller-row';
+    var src=(s.source||'').toLowerCase();
+    var tel=(s.phone||'').replace(/[^+\d]/g,'');
+    row.innerHTML=
+      '<div class="sr-owner">'+escapeHtml(s.owner||'OWNER OF RECORD')+'</div>'+
+      '<div class="sr-price">$'+Math.round((s.price||0)/1000)+'K</div>'+
+      '<div class="sr-addr">'+escapeHtml(s.street||'')+(s.city?' · '+escapeHtml(s.city):'')+'</div>'+
+      '<div class="sr-phone">'+
+        '<a href="tel:'+tel+'">'+escapeHtml(s.phone||'—')+'</a>'+
+        '<span class="sr-meta-pill s-'+src+'">'+src.toUpperCase()+'</span>'+
+        '<span class="sr-listed">LISTED '+escapeHtml(s.listed||'')+'</span>'+
+      '</div>';
+    el.appendChild(row);
+  }
 }
 
 function setHeatMode(m){
@@ -2766,9 +2978,7 @@ function renderRoster(){
   var bc=$('tg-buy-count');if(bc)animateNumber(bc,rows.length);
   var sc=$('tg-sell-count');
   if(sc){
-    var total=0;
-    if(S.activeCounty){total=SAMPLE_SELLERS[S.activeCounty]||0;}
-    else{for(var nm in SAMPLE_SELLERS)total+=SAMPLE_SELLERS[nm];}
+    var total=S.activeCounty?sellersIn(S.activeCounty).length:SAMPLE_SELLERS.length;
     animateNumber(sc,total);
   }
 }
@@ -2783,9 +2993,11 @@ function addBuyer(){
 function renderTarget(){
   // Defensive: skip if Target page isn't in the DOM (e.g. during early boot ordering issues).
   if(!$('tx-map'))return;
+  // Map-pane label includes the live SAMPLE_SELLERS count so the user can see the corpus size.
+  var lbl=$('map-lbl'); if(lbl&&!S.activeCounty)lbl.textContent='SELLERS · '+SAMPLE_SELLERS.length+' LOGGED · 254 COUNTIES';
   renderMap();
   renderRoster();
-  // Restore prior heat-toggle / active-county from S
+  // Restore prior active county from S so swap-in survives reloads.
   if(S.activeCounty){
     selectCounty(S.activeCounty);
   }
@@ -2806,7 +3018,7 @@ function renderTargetMini(){
   var cl=$('tm-counties'),bl=$('tm-buyers');
   if(cl){
     // Top 5 counties by seller count
-    var ranked=Object.keys(SAMPLE_SELLERS).map(function(n){return {n:n,c:SAMPLE_SELLERS[n]};}).sort(function(a,b){return b.c-a.c;}).slice(0,5);
+    var ranked=Object.keys(_sellersByCounty).map(function(n){return {n:n,c:_sellersByCounty[n].length};}).sort(function(a,b){return b.c-a.c;}).slice(0,5);
     cl.innerHTML='';
     for(var i=0;i<ranked.length;i++){
       var li=document.createElement('li');
